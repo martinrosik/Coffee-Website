@@ -5,6 +5,7 @@ import ContactPage from "./contact/_layout/ContactPage";
 import AboutPage from "./about/_layout/AboutPage";
 import AdminPage from "./admin/_layout/AdminPage";
 import NotFoundPage from "./notfound/_layout/NotFoundPage";
+import LoginPage from "./account/login/LoginPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
