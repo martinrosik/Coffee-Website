@@ -3,6 +3,8 @@ import HomePage from "./home/_layout/HomePage";
 import MenuPage from "./menu/_layout/MenuPage";
 import ContactPage from "./contact/_layout/ContactPage";
 import AboutPage from "./about/_layout/AboutPage";
+import AdminPage from "./admin/_layout/AdminPage";
+import NotFoundPage from "./notfound/_layout/NotFoundPage";
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

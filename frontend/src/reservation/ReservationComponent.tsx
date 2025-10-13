@@ -18,7 +18,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-// Simple date formatter (replacing date-fns)
+// Simple date formatter
 const formatDate = (date) => {
   if (!date) return '';
   return date.toLocaleDateString('en-US', { 
@@ -35,13 +35,15 @@ export default function ReservationComponent() {
   const [time, setTime] = useState("");
   const [date, setDate] = useState();
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(""); // <-- New state for errors
 
   const handleSubmit = () => {
     if (!name || !date || !time) {
-      alert("Please fill in all required fields before submitting.");
+      setError("Please fill in all required fields before submitting."); // <-- show error instead of alert
       return;
     }
 
+    setError(""); // clear error
     setSubmitted(true);
     setTimeout(() => {
       setName("");
@@ -74,6 +76,12 @@ export default function ReservationComponent() {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
+              {error && (
+                <div className="p-2 text-red-600 text-sm text-center border border-red-200 rounded-md">
+                  {error}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
                   Name
