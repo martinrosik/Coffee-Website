@@ -1,5 +1,5 @@
 import { BiSolidCoffeeBean } from "react-icons/bi";
-
+import { Link } from "react-router-dom"; // ✅ Import Link
 import { Button } from "@/components/ui/button";
 
 interface Hero1Props {
@@ -28,15 +28,15 @@ const Hero1 = ({
   buttons = {
     primary: {
       text: "Menu",
-      url: "https://www.shadcnblocks.com",
+      url: "/menu",
     },
     secondary: {
       text: "About us",
-      url: "https://www.shadcnblocks.com",
+      url: "/about",
     },
   },
   image = {
-    src: "../../../public/assets/img/image1.jpg",
+    src: "/assets/img/image1.jpg",
     alt: "Hero section demo image showing interface components",
   },
 }: Hero1Props) => {
@@ -54,15 +54,18 @@ const Hero1 = ({
             <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
               {buttons.primary && (
                 <Button asChild className="w-full sm:w-auto">
-                  <a href={buttons.primary.url}>{buttons.primary.text}</a>
+                  <Link to={buttons.primary.url}>{buttons.primary.text}</Link>
                 </Button>
               )}
               {buttons.secondary && (
                 <Button asChild variant="outline" className="w-full sm:w-auto">
-                  <a href={buttons.secondary.url}>
+                  <Link
+                    to={buttons.secondary.url}
+                    className="flex items-center gap-1"
+                  >
                     {buttons.secondary.text}
                     <BiSolidCoffeeBean className="size-4" />
-                  </a>
+                  </Link>
                 </Button>
               )}
             </div>

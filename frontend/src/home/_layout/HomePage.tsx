@@ -3,8 +3,6 @@ import Navbar from "../../navbar/Navbar";
 import FaqComponent from "@/faq/FaqComponent";
 import BannerComponent from "@/banner/BannerComponent";
 import Footer from "@/footer/Footer";
-import GalleryComponent from "@/gallery/GaleryComponent";
-import TeamComponent from "@/team/TeamComponent";
 
 export default function HomePage() {
   return (
@@ -13,8 +11,6 @@ export default function HomePage() {
     <BannerComponent />
     <ReservationComponent />
     <FaqComponent />
-    <TeamComponent />
-    <GalleryComponent />
     <Footer />
     </>
   );

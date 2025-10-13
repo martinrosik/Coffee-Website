@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { RiTeamFill } from "react-icons/ri";
 
 interface TeamMember {
   id: string;
@@ -65,9 +66,10 @@ const Team1 = ({
   return (
     <section className="py-32">
       <div className="container flex flex-col items-center text-center">
-        <h2 className="my-6 text-pretty text-2xl font-bold lg:text-4xl">
-          {heading}
-        </h2>
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <RiTeamFill className="w-12 h-12 text-primary" />
+          <h1 className="text-4xl font-bold text-foreground">{heading}</h1>
+        </div>
         <p className="text-muted-foreground mb-8 max-w-3xl lg:text-xl">
           {description}
         </p>

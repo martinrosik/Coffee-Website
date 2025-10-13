@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // ✅ Import Link
 import {
   Accordion,
   AccordionContent,
@@ -20,7 +21,6 @@ interface Faq1Props {
   items?: FaqItem[];
   ctaText?: string;
   ctaDescription?: string;
-  onContactClick?: () => void;
 }
 
 const Faq1 = ({
@@ -60,7 +60,6 @@ const Faq1 = ({
   ],
   ctaText = "Still have questions?",
   ctaDescription = "Our friendly team is here to help. Reach out and we'll get back to you soon.",
-  onContactClick,
 }: Faq1Props) => {
   return (
     <section
@@ -105,7 +104,9 @@ const Faq1 = ({
               <AccordionContent className="px-5 pb-4 pt-1 transition-all duration-300">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-6 h-6 rounded-md bg-muted flex items-center justify-center">
-                    <span className="text-muted-foreground font-bold text-xs">A</span>
+                    <span className="text-muted-foreground font-bold text-xs">
+                      A
+                    </span>
                   </div>
                   <p className="flex-1 text-muted-foreground text-sm leading-relaxed">
                     {item.answer}
@@ -121,14 +122,14 @@ const Faq1 = ({
           <div className="inline-block bg-card rounded-2xl shadow-lg p-8 border border-border max-w-md hover:shadow-xl transition-all duration-300">
             <MessageCircle className="w-10 h-10 text-primary mx-auto mb-3 animate-pulse" />
             <h3 className="text-lg font-semibold mb-2">{ctaText}</h3>
-            <p className="text-muted-foreground text-sm mb-5">{ctaDescription}</p>
-            <Button
-              size="sm"
-              className="gap-2"
-              onClick={onContactClick}
-            >
-              <MessageCircle className="w-4 h-4" />
-              Contact Us
+            <p className="text-muted-foreground text-sm mb-5">
+              {ctaDescription}
+            </p>
+            <Button size="sm" className="gap-2" asChild>
+              <Link to="/contact" className="flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Contact Us
+              </Link>
             </Button>
           </div>
         </div>

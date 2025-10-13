@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { GrGallery } from "react-icons/gr";
 
 export default function CoffeeGallery() {
   const galleryItems = [
@@ -96,9 +97,10 @@ export default function CoffeeGallery() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-3">
-            Our Gallery
-          </h1>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <GrGallery className="w-12 h-12 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Our Gallery</h1>
+          </div>
           <p className="text-lg text-muted-foreground">
             Explore our coffee, food, and atmosphere
           </p>
