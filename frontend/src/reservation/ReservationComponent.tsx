@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -20,17 +27,18 @@ import { Calendar as CalendarIcon } from "lucide-react";
 
 // Simple date formatter
 const formatDate = (date) => {
-  if (!date) return '';
-  return date.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  if (!date) return "";
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 };
 
 export default function ReservationComponent() {
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState(""); // <-- Added phone state
   const [guests, setGuests] = useState("2");
   const [time, setTime] = useState("");
   const [date, setDate] = useState();
@@ -38,15 +46,16 @@ export default function ReservationComponent() {
   const [error, setError] = useState(""); // <-- New state for errors
 
   const handleSubmit = () => {
-    if (!name || !date || !time) {
-      setError("Please fill in all required fields before submitting."); // <-- show error instead of alert
+    if (!name || !phone || !date || !time) {
+      setError("Please fill in all required fields before submitting.");
       return;
     }
 
-    setError(""); // clear error
+    setError("");
     setSubmitted(true);
     setTimeout(() => {
       setName("");
+      setPhone("");
       setGuests("2");
       setTime("");
       setDate(undefined);
@@ -58,9 +67,10 @@ export default function ReservationComponent() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-2">
-            Reservations
-          </h1>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <FaRegCalendarAlt className="w-12 h-12 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Reservations</h1>
+          </div>
           <p className="text-muted-foreground">Book your table in advance</p>
         </div>
 
@@ -84,7 +94,7 @@ export default function ReservationComponent() {
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Name
+                  Name*
                 </Label>
                 <Input
                   id="name"
@@ -95,11 +105,23 @@ export default function ReservationComponent() {
                 />
               </div>
 
+              {/* Added Phone Field */}
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium">
+                  Phone*
+                </Label>
+                <Input
+                  id="phone"
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="h-10"
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">
-                    Date
-                  </Label>
+                  <Label className="text-sm font-medium">Date*</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -123,7 +145,7 @@ export default function ReservationComponent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="time" className="text-sm font-medium">
-                    Time
+                    Time*
                   </Label>
                   <Select onValueChange={setTime} value={time}>
                     <SelectTrigger className="h-10">
@@ -147,7 +169,7 @@ export default function ReservationComponent() {
 
               <div className="space-y-2">
                 <Label htmlFor="guests" className="text-sm font-medium">
-                  Number of Guests
+                  Number of Guests*
                 </Label>
                 <Select onValueChange={setGuests} value={guests}>
                   <SelectTrigger className="h-10">
