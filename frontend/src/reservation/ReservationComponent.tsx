@@ -1,4 +1,5 @@
 import { useState } from "react";
+import api from "@/_shared/api/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +26,6 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-// Simple date formatter
 const formatDate = (date) => {
   if (!date) return "";
   return date.toLocaleDateString("en-US", {
@@ -38,29 +38,55 @@ const formatDate = (date) => {
 
 export default function ReservationComponent() {
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState(""); // <-- Added phone state
+  const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState("2");
   const [time, setTime] = useState("");
   const [date, setDate] = useState();
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(""); // <-- New state for errors
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || !phone || !date || !time) {
       setError("Please fill in all required fields before submitting.");
       return;
     }
 
     setError("");
-    setSubmitted(true);
-    setTimeout(() => {
-      setName("");
-      setPhone("");
-      setGuests("2");
-      setTime("");
-      setDate(undefined);
-      setSubmitted(false);
-    }, 3000);
+    setLoading(true);
+
+    try {
+      const reservationData = {
+        name,
+        phone,
+        guests: Number(guests),
+        date: date.toISOString().split("T")[0], // format: YYYY-MM-DD
+        time,
+      };
+
+      // POST to your backend
+      const response = await api.post("/reservations", reservationData);
+
+      console.log("Reservation created:", response.data);
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setName("");
+        setPhone("");
+        setGuests("2");
+        setTime("");
+        setDate(undefined);
+        setSubmitted(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      setError(
+        err.response?.data?.message ||
+          "Something went wrong while creating the reservation."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -105,7 +131,6 @@ export default function ReservationComponent() {
                 />
               </div>
 
-              {/* Added Phone Field */}
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-sm font-medium">
                   Phone*
@@ -152,16 +177,22 @@ export default function ReservationComponent() {
                       <SelectValue placeholder="Select a time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="9:00 AM">9:00 AM</SelectItem>
-                      <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                      <SelectItem value="11:00 AM">11:00 AM</SelectItem>
-                      <SelectItem value="12:00 PM">12:00 PM</SelectItem>
-                      <SelectItem value="1:00 PM">1:00 PM</SelectItem>
-                      <SelectItem value="2:00 PM">2:00 PM</SelectItem>
-                      <SelectItem value="3:00 PM">3:00 PM</SelectItem>
-                      <SelectItem value="4:00 PM">4:00 PM</SelectItem>
-                      <SelectItem value="5:00 PM">5:00 PM</SelectItem>
-                      <SelectItem value="6:00 PM">6:00 PM</SelectItem>
+                      {[
+                        "9:00 AM",
+                        "10:00 AM",
+                        "11:00 AM",
+                        "12:00 PM",
+                        "1:00 PM",
+                        "2:00 PM",
+                        "3:00 PM",
+                        "4:00 PM",
+                        "5:00 PM",
+                        "6:00 PM",
+                      ].map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -185,8 +216,12 @@ export default function ReservationComponent() {
                 </Select>
               </div>
 
-              <Button onClick={handleSubmit} className="w-full h-11 text-base">
-                Confirm Reservation
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full h-11 text-base"
+              >
+                {loading ? "Submitting..." : "Confirm Reservation"}
               </Button>
             </div>
 

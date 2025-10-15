@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { FaRegCalendarAlt } from "react-icons/fa";
-import { cn } from "@/lib/utils";
+import { cn } from "@/_shared/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
