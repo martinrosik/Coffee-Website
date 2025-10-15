@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import api from "@/_shared/api/api";
 import {
   Card,
   CardContent,
@@ -31,37 +30,14 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-// ------------------- TypeScript Interfaces -------------------
-interface Reservation {
-  id: string;
-  name: string;
-  date: string;
-  time: string;
-  guests: number;
-  status: string;
-}
-
-interface Contact {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-  status: string;
-}
-
-// ------------------- Component -------------------
 export default function AdminPanelComponent() {
-  const [selectedReservation, setSelectedReservation] =
-    useState<Reservation | null>(null);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [selectedContact, setSelectedContact] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [reservations, setReservations] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ------------------- Fetch Data -------------------
   useEffect(() => {
     fetchReservations();
     fetchContacts();
@@ -70,7 +46,8 @@ export default function AdminPanelComponent() {
   const fetchReservations = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get<Reservation[]>("/reservations");
+      const response = await fetch("/api/reservations");
+      const data = await response.json();
       setReservations(data);
     } catch (error) {
       console.error("Error fetching reservations:", error);
@@ -81,15 +58,15 @@ export default function AdminPanelComponent() {
 
   const fetchContacts = async () => {
     try {
-      const { data } = await api.get<Contact[]>("/contacts");
+      const response = await fetch("/api/contacts");
+      const data = await response.json();
       setContacts(data);
     } catch (error) {
       console.error("Error fetching contacts:", error);
     }
   };
 
-  // ------------------- Status Helpers -------------------
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case "confirmed":
         return "default";
@@ -106,7 +83,7 @@ export default function AdminPanelComponent() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case "confirmed":
         return <CheckCircle className="w-4 h-4" />;
@@ -123,10 +100,13 @@ export default function AdminPanelComponent() {
     }
   };
 
-  // ------------------- Update Status -------------------
-  const updateReservationStatus = async (id: string, newStatus: string) => {
+  const updateReservationStatus = async (id, newStatus) => {
     try {
-      await api.patch(`/api/reservations/${id}`, { status: newStatus });
+      await fetch(`/api/reservations/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
       setReservations(
         reservations.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       );
@@ -136,9 +116,13 @@ export default function AdminPanelComponent() {
     }
   };
 
-  const updateContactStatus = async (id: string, newStatus: string) => {
+  const updateContactStatus = async (id, newStatus) => {
     try {
-      await api.patch(`/api/contacts/${id}`, { status: newStatus });
+      await fetch(`/api/contacts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
       setContacts(
         contacts.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
       );
@@ -148,18 +132,17 @@ export default function AdminPanelComponent() {
     }
   };
 
-  // ------------------- Filters -------------------
   const filteredReservations = reservations.filter(
     (r) =>
-      r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.date.includes(searchTerm)
+      r.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.date?.includes(searchTerm)
   );
 
   const filteredContacts = contacts.filter(
     (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.subject?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const stats = {
@@ -171,7 +154,6 @@ export default function AdminPanelComponent() {
     newContacts: contacts.filter((c) => c.status === "new").length,
   };
 
-  // ------------------- Loading State -------------------
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -180,11 +162,9 @@ export default function AdminPanelComponent() {
     );
   }
 
-  // ------------------- Render -------------------
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Admin Panel
@@ -194,7 +174,6 @@ export default function AdminPanelComponent() {
           </p>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="pb-3">
@@ -246,7 +225,6 @@ export default function AdminPanelComponent() {
           </Card>
         </div>
 
-        {/* Search */}
         <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -259,21 +237,21 @@ export default function AdminPanelComponent() {
           </div>
         </div>
 
-        {/* Tabs */}
         <Tabs defaultValue="reservations" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger
               value="reservations"
               className="flex items-center gap-2"
             >
-              <Calendar className="w-4 h-4" /> Reservations
+              <Calendar className="w-4 h-4" />
+              Reservations
             </TabsTrigger>
             <TabsTrigger value="contacts" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" /> Contact Messages
+              <Mail className="w-4 h-4" />
+              Contact Messages
             </TabsTrigger>
           </TabsList>
 
-          {/* Reservations Tab */}
           <TabsContent value="reservations">
             <Card>
               <CardHeader>
@@ -305,15 +283,15 @@ export default function AdminPanelComponent() {
                               </div>
                               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
-                                  <Calendar className="w-4 h-4" />{" "}
+                                  <Calendar className="w-4 h-4" />
                                   {reservation.date}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Clock className="w-4 h-4" />{" "}
+                                  <Clock className="w-4 h-4" />
                                   {reservation.time}
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Users className="w-4 h-4" />{" "}
+                                  <Users className="w-4 h-4" />
                                   {reservation.guests} guests
                                 </div>
                               </div>
@@ -346,7 +324,6 @@ export default function AdminPanelComponent() {
             </Card>
           </TabsContent>
 
-          {/* Contacts Tab */}
           <TabsContent value="contacts">
             <Card>
               <CardHeader>
@@ -378,11 +355,12 @@ export default function AdminPanelComponent() {
                               </div>
                               <div className="space-y-1 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
-                                  <Mail className="w-4 h-4" /> {contact.email}
+                                  <Mail className="w-4 h-4" />
+                                  {contact.email}
                                 </div>
                                 {contact.phone && (
                                   <div className="flex items-center gap-1">
-                                    <Phone className="w-4 h-4" />{" "}
+                                    <Phone className="w-4 h-4" />
                                     {contact.phone}
                                   </div>
                                 )}
@@ -418,7 +396,6 @@ export default function AdminPanelComponent() {
           </TabsContent>
         </Tabs>
 
-        {/* Reservation Dialog */}
         <Dialog
           open={selectedReservation !== null}
           onOpenChange={() => setSelectedReservation(null)}
@@ -524,7 +501,6 @@ export default function AdminPanelComponent() {
           </DialogContent>
         </Dialog>
 
-        {/* Contact Dialog */}
         <Dialog
           open={selectedContact !== null}
           onOpenChange={() => setSelectedContact(null)}
