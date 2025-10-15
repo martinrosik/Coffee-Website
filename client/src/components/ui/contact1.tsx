@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Coffee, Mail, Phone, MapPin } from "lucide-react";
+import { useContact } from "@/_shared/hooks/useContact";
 
 export default function CoffeeShopContact() {
   const [formData, setFormData] = useState({
@@ -21,33 +22,28 @@ export default function CoffeeShopContact() {
     subject: "",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e) => {
+  const { loading, error, data, submitContact } = useContact();
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = () => {
-    if (
-      formData.name &&
-      formData.email &&
-      formData.subject &&
-      formData.message
-    ) {
-      setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          subject: "",
-          message: "",
-        });
-      }, 5000);
+  const handleSubmit = async () => {
+    const result = await submitContact(formData);
+    if (result) {
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
     }
   };
 
@@ -66,7 +62,7 @@ export default function CoffeeShopContact() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Contact Info Cards */}
+          {/* Contact Info */}
           <div className="space-y-4">
             <Card>
               <CardHeader>
@@ -118,7 +114,12 @@ export default function CoffeeShopContact() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {submitted && (
+              {error && (
+                <Alert className="mb-6" variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              {data && (
                 <Alert className="mb-6">
                   <AlertDescription>
                     Thank you for your message! We'll get back to you soon.
@@ -187,8 +188,12 @@ export default function CoffeeShopContact() {
                   />
                 </div>
 
-                <Button onClick={handleSubmit} className="w-full">
-                  Send Message
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? "Sending..." : "Send Message"}
                 </Button>
               </div>
             </CardContent>

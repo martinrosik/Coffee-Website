@@ -24,43 +24,41 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useReservation } from "@/_shared/hooks/useReservation";
 
-// Simple date formatter
-const formatDate = (date) => {
-  if (!date) return "";
-  return date.toLocaleDateString("en-US", {
+const formatDateToString = (date: Date) =>
+  date.toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
-};
 
 export default function ReservationComponent() {
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState(""); // <-- Added phone state
+  const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState("2");
   const [time, setTime] = useState("");
-  const [date, setDate] = useState();
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(""); // <-- New state for errors
+  const [date, setDate] = useState<string>("");
 
-  const handleSubmit = () => {
-    if (!name || !phone || !date || !time) {
-      setError("Please fill in all required fields before submitting.");
-      return;
-    }
+  const { loading, error, data, submitReservation } = useReservation();
 
-    setError("");
-    setSubmitted(true);
-    setTimeout(() => {
+  const handleSubmit = async () => {
+    await submitReservation({
+      name,
+      phone,
+      guests: Number(guests),
+      time,
+      date,
+    });
+
+    if (!error) {
       setName("");
       setPhone("");
       setGuests("2");
       setTime("");
-      setDate(undefined);
-      setSubmitted(false);
-    }, 3000);
+      setDate("");
+    }
   };
 
   return (
@@ -105,7 +103,6 @@ export default function ReservationComponent() {
                 />
               </div>
 
-              {/* Added Phone Field */}
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-sm font-medium">
                   Phone*
@@ -129,14 +126,14 @@ export default function ReservationComponent() {
                         className="w-full h-10 justify-start text-left font-normal"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? formatDate(date) : <span>Pick a date</span>}
+                        {date || <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={date}
-                        onSelect={setDate}
+                        selected={date ? new Date(date) : undefined}
+                        onSelect={(d) => d && setDate(formatDateToString(d))}
                         initialFocus
                       />
                     </PopoverContent>
@@ -152,16 +149,22 @@ export default function ReservationComponent() {
                       <SelectValue placeholder="Select a time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="9:00 AM">9:00 AM</SelectItem>
-                      <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                      <SelectItem value="11:00 AM">11:00 AM</SelectItem>
-                      <SelectItem value="12:00 PM">12:00 PM</SelectItem>
-                      <SelectItem value="1:00 PM">1:00 PM</SelectItem>
-                      <SelectItem value="2:00 PM">2:00 PM</SelectItem>
-                      <SelectItem value="3:00 PM">3:00 PM</SelectItem>
-                      <SelectItem value="4:00 PM">4:00 PM</SelectItem>
-                      <SelectItem value="5:00 PM">5:00 PM</SelectItem>
-                      <SelectItem value="6:00 PM">6:00 PM</SelectItem>
+                      {[
+                        "9:00 AM",
+                        "10:00 AM",
+                        "11:00 AM",
+                        "12:00 PM",
+                        "1:00 PM",
+                        "2:00 PM",
+                        "3:00 PM",
+                        "4:00 PM",
+                        "5:00 PM",
+                        "6:00 PM",
+                      ].map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -185,19 +188,23 @@ export default function ReservationComponent() {
                 </Select>
               </div>
 
-              <Button onClick={handleSubmit} className="w-full h-11 text-base">
-                Confirm Reservation
+              <Button
+                onClick={handleSubmit}
+                className="w-full h-11 text-base"
+                disabled={loading}
+              >
+                {loading ? "Submitting..." : "Confirm Reservation"}
               </Button>
-            </div>
 
-            {submitted && (
-              <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
-                <p className="text-primary text-sm font-medium text-center flex items-center justify-center gap-2">
-                  <span className="text-lg">✓</span>
-                  Your table has been reserved successfully!
-                </p>
-              </div>
-            )}
+              {data && (
+                <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                  <p className="text-primary text-sm font-medium text-center flex items-center justify-center gap-2">
+                    <span className="text-lg">✓</span>
+                    Your table has been reserved successfully!
+                  </p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>
