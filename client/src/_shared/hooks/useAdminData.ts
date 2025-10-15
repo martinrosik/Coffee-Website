@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "@/shared/api/api";
+import api from "@/_shared/api/api";
 
 export type Reservation = {
   id: number;
@@ -29,7 +29,10 @@ export function useAdminData() {
   const fetchReservations = async () => {
     try {
       const response = await api.get("/reservations");
-      setReservations(response.data);
+      // Map _id to id if backend uses _id
+      setReservations(
+        response.data.map((r: any) => ({ ...r, id: r.id ?? r._id }))
+      );
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to fetch reservations");
     }
@@ -38,7 +41,7 @@ export function useAdminData() {
   const fetchContacts = async () => {
     try {
       const response = await api.get("/contacts");
-      setContacts(response.data);
+      setContacts(response.data.map((c: any) => ({ ...c, id: c.id ?? c._id })));
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to fetch contacts");
     }
@@ -51,25 +54,23 @@ export function useAdminData() {
     );
   }, []);
 
-  const updateReservationStatus = async (id: number, status: string) => {
+  const deleteReservation = async (id?: number) => {
+    if (!id) return;
     try {
-      await api.patch(`/reservations/${id}`, { status });
-      setReservations((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, status } : r))
-      );
+      await api.delete(`/reservations/${id}`);
+      setReservations((prev) => prev.filter((r) => r.id !== id));
     } catch (err: any) {
-      console.error(err);
+      console.error("Failed to delete reservation:", err);
     }
   };
 
-  const updateContactStatus = async (id: number, status: string) => {
+  const deleteContact = async (id?: number) => {
+    if (!id) return;
     try {
-      await api.patch(`/contacts/${id}`, { status });
-      setContacts((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, status } : c))
-      );
+      await api.delete(`/contacts/${id}`);
+      setContacts((prev) => prev.filter((c) => c.id !== id));
     } catch (err: any) {
-      console.error(err);
+      console.error("Failed to delete contact:", err);
     }
   };
 
@@ -78,7 +79,7 @@ export function useAdminData() {
     contacts,
     loading,
     error,
-    updateReservationStatus,
-    updateContactStatus,
+    deleteReservation,
+    deleteContact,
   };
 }

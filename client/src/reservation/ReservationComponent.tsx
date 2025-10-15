@@ -109,9 +109,18 @@ export default function ReservationComponent() {
                 </Label>
                 <Input
                   id="phone"
-                  placeholder="Enter your phone number"
+                  placeholder="111 111 111"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    const input = e.target.value;
+                    const formatted = input
+                      .replace(/\D/g, "")
+                      .substring(0, 9)
+                      .replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, a, b, c) =>
+                        [a, b, c].filter(Boolean).join(" ")
+                      );
+                    setPhone(formatted);
+                  }}
                   className="h-10"
                 />
               </div>

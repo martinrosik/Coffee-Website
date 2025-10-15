@@ -28,10 +28,19 @@ export default function CoffeeShopContact() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    if (name === "phone") {
+      const formatted = value
+        .replace(/\D/g, "")
+        .substring(0, 9)
+        .replace(/(\d{3})(\d{0,3})(\d{0,3})/, (_, a, b, c) =>
+          [a, b, c].filter(Boolean).join(" ")
+        );
+      setFormData({ ...formData, [name]: formatted });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async () => {
@@ -161,7 +170,8 @@ export default function CoffeeShopContact() {
                       type="tel"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+421 123 456 789"
+                      placeholder="111 111 111"
+                      pattern="\d{3} \d{3} \d{3}"
                     />
                   </div>
                   <div className="space-y-2">
