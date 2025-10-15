@@ -1,7 +1,7 @@
 # Coffee Shop Web Application ☕
 
 ## Overview
-This project is a modern web application for a Coffee Shop, built using **React**, **Next.js**, and **Shadcn UI components** for a seamless user interface. The backend is powered by **MongoDB** for data management. This website is fully ready to use!
+This project is a modern web application for a Coffee Shop, built using **React**, **Express**, and **Shadcn UI components** for a seamless user interface. The backend is powered by **MongoDB** for data management. This website is fully ready to use!
 
 ## Features
 - Admin panel to manage reservations and contact messages.
@@ -11,7 +11,7 @@ This project is a modern web application for a Coffee Shop, built using **React*
 
 ## Technologies Used
 - **Frontend:** React, Shadcn UI components, Custom Tweakcn theme
-- **Backend:**  Next.js
+- **Backend:**  Express
 - **Database:** MongoDB
   
 ## License
