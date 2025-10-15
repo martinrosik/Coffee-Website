@@ -19,10 +19,15 @@ exports.getReservationById = async (req, res) => {
   }
 };
 
+const scheduleReservationReminder = require("../utils/scheduler");
+
 exports.createReservation = async (req, res) => {
   const reservation = new Reservation(req.body);
   try {
     const newReservation = await reservation.save();
+
+    scheduleReservationReminder(newReservation);
+
     res.status(201).json(newReservation);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -31,8 +36,13 @@ exports.createReservation = async (req, res) => {
 
 exports.updateReservation = async (req, res) => {
   try {
-    const updatedReservation = await Reservation.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedReservation) return res.status(404).json({ message: "Not found" });
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!updatedReservation)
+      return res.status(404).json({ message: "Not found" });
     res.json(updatedReservation);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -41,8 +51,11 @@ exports.updateReservation = async (req, res) => {
 
 exports.deleteReservation = async (req, res) => {
   try {
-    const deletedReservation = await Reservation.findByIdAndDelete(req.params.id);
-    if (!deletedReservation) return res.status(404).json({ message: "Not found" });
+    const deletedReservation = await Reservation.findByIdAndDelete(
+      req.params.id
+    );
+    if (!deletedReservation)
+      return res.status(404).json({ message: "Not found" });
     res.json({ message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
