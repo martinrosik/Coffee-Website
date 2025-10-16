@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { RiAdminFill } from "react-icons/ri";
 import {
   Calendar,
   Mail,
@@ -14,9 +15,11 @@ import {
 } from "lucide-react";
 
 import { useAdminData } from "@/_shared/hooks/useAdminData";
+import { isAdmin, logout } from "@/_shared/auth/auth";
 
 export default function AdminPanelComponent() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [authorized, setAuthorized] = useState(false);
 
   const {
     reservations,
@@ -26,6 +29,24 @@ export default function AdminPanelComponent() {
     deleteReservation,
     deleteContact,
   } = useAdminData();
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAccess = async () => {
+      const admin = await isAdmin();
+      if (!admin) {
+        logout(); // Redirect non-admins to login
+      } else {
+        setAuthorized(true);
+      }
+    };
+    checkAccess();
+  }, []);
+
+  if (!authorized)
+    return <p className="text-center py-8">Checking access...</p>;
+  if (loading) return <p className="text-center py-8">Loading...</p>;
+  if (error) return <p className="text-center py-8 text-red-600">{error}</p>;
 
   const filteredReservations = reservations.filter(
     (r) =>
@@ -40,11 +61,17 @@ export default function AdminPanelComponent() {
       c.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <p className="text-center py-8">Loading...</p>;
-  if (error) return <p className="text-center py-8 text-red-600">{error}</p>;
-
   return (
     <div className="min-h-screen bg-background py-8 px-4">
+      <div className="text-center mb-12">
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <RiAdminFill className="w-12 h-12 text-primary" />
+          <h1 className="text-4xl font-bold text-foreground">Admin Panel</h1>
+        </div>
+        <p className="text-lg text-muted-foreground">
+          Manage reservations and contact messages
+        </p>
+      </div>
       <div className="max-w-7xl mx-auto">
         {/* Dashboard Banners */}
         <div className="grid grid-cols-2 gap-4 mb-6">

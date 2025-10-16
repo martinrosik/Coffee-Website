@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Coffee, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import api from "@/_shared/api/api";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -24,25 +25,17 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await api.post("/auth/login", { email, password });
+      localStorage.setItem("token", response.data.token);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem("token", data.token);
-        window.location.href = "/admin";
-      } else {
-        setError(data.message || "Invalid email or password");
-      }
+      window.location.href = "/admin";
     } catch (err) {
-      setError("An error occurred. Please try again.");
       console.error("Login error:", err);
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -59,6 +52,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
+      {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -85,13 +79,14 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
+              {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -108,6 +103,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -135,14 +131,11 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
-              <Button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="w-full"
-              >
+
+              <Button type="submit" disabled={loading} className="w-full">
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
       </div>

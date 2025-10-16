@@ -4,6 +4,7 @@ import api from "@/_shared/api/api";
 interface ReservationData {
   name: string;
   phone: string;
+  email: string;
   guests: number;
   time: string;
   date: string;
@@ -18,6 +19,7 @@ export function useReservation() {
     if (
       !reservation.name ||
       !reservation.phone ||
+      !reservation.email ||
       !reservation.date ||
       !reservation.time
     ) {

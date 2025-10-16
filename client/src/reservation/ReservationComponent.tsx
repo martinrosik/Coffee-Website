@@ -36,6 +36,7 @@ const formatDateToString = (date: Date) =>
 
 export default function ReservationComponent() {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState("2");
   const [time, setTime] = useState("");
@@ -44,16 +45,18 @@ export default function ReservationComponent() {
   const { loading, error, data, submitReservation } = useReservation();
 
   const handleSubmit = async () => {
-    await submitReservation({
+    const success = await submitReservation({
       name,
+      email,
       phone,
       guests: Number(guests),
       time,
       date,
     });
 
-    if (!error) {
+    if (success) {
       setName("");
+      setEmail("");
       setPhone("");
       setGuests("2");
       setTime("");
@@ -99,6 +102,20 @@ export default function ReservationComponent() {
                   placeholder="Enter your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="h-10"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email*
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="h-10"
                 />
               </div>

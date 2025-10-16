@@ -1,13 +1,22 @@
 import { Coffee, Menu } from "lucide-react";
-import { useState } from "react";
-import { Link } from "react-router-dom"; // ✅ Import Link
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { isAdmin, logout } from "@/_shared/auth/auth";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
 
-  // Use paths that match your routes
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const admin = await isAdmin();
+      setAdminLoggedIn(admin);
+    };
+    checkAdmin();
+  }, []);
+
   const navItems = [
     { name: "Home", path: "/" },
     { name: "Menu", path: "/menu" },
@@ -19,7 +28,6 @@ export default function Navbar() {
     <nav className="border-b bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2 cursor-pointer">
             <Coffee className="w-6 h-6 text-primary" />
             <div>
@@ -32,7 +40,6 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
@@ -44,9 +51,14 @@ export default function Navbar() {
               </Link>
             ))}
             <Button size="sm">Order Now</Button>
+
+            {adminLoggedIn && (
+              <Button variant="destructive" size="sm" onClick={logout}>
+                Logout
+              </Button>
+            )}
           </div>
 
-          {/* Mobile Navigation */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -69,6 +81,19 @@ export default function Navbar() {
                 <Button className="w-full" onClick={() => setIsOpen(false)}>
                   Order Now
                 </Button>
+
+                {adminLoggedIn && (
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                  >
+                    Logout
+                  </Button>
+                )}
               </div>
             </SheetContent>
           </Sheet>
