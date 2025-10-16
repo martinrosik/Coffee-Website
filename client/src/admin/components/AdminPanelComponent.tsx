@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { useAdminData } from "@/_shared/hooks/useAdminData";
-import { isAdmin, logout } from "@/_shared/auth/auth";
+import { isAdmin, logout } from "@/_shared/utils/auth";
 
 export default function AdminPanelComponent() {
   const [searchTerm, setSearchTerm] = useState("");
